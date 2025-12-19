@@ -7,18 +7,7 @@ BASE_PATH = "data/processed"
 CSV_PATH = os.path.join(BASE_PATH, "corpus.csv")
 JSON_PATH = os.path.join(BASE_PATH, "corpus_json.json")
 EXCEL_PATH = os.path.join(BASE_PATH, "corpus_analysis.xlsx")
-
-def csv_to_json(csv_path, json_path):
-    """
-    Convert CSV file to JSON, it allows us to reuse the corpus in different formats
-    without rerunning the scraping process.
-    """
-    if not os.path.exists(csv_path):
-        raise FileNotFoundError(f"{csv_path} not found")
-    df = pd.read_csv(csv_path)
-    df.to_json(json_path, orient="records", force_ascii=False, indent=2)
-    print(f"CSV successfully converted: {json_path}")
-    return df  
+ 
 
 def main():
     df = csv_to_json(CSV_PATH, JSON_PATH)
