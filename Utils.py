@@ -4,6 +4,11 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import pandas as pd
 
+
+#---------------------------------------------------
+# Part1. WEB SCRAPING UTILITIES
+#--------------------------------------------------
+
 # 1. CHECK WEBSITE ACCESSIBILITY
 def check_website_accessibility(cities: dict, timeout: int = 10) -> dict:
     """
@@ -149,3 +154,18 @@ def build_dataframe(pages: list) -> pd.DataFrame:
     """
     return pd.DataFrame(pages)
 
+#---------------------------------------------------
+# Part2. DATA PROCESSING UTILITIES
+#--------------------------------------------------
+
+def csv_to_json(csv_path, json_path):
+    """
+    Convert CSV file to JSON, it allows us to reuse the corpus in different formats
+    without rerunning the scraping process.
+    """
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"{csv_path} not found")
+    df = pd.read_csv(csv_path)
+    df.to_json(json_path, orient="records", force_ascii=False, indent=2)
+    print(f"CSV successfully converted: {json_path}")
+    return df  
