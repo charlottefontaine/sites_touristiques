@@ -13,4 +13,9 @@ CITIES = {
 }
 
 REQUEST_TIMEOUT = 10
+
+project_stopwords = ["barcelone", "barcelona", "lisboa","roma","rome", "anvers", "antwerpen", 
+                     "amsterdam","valencia", "copenhagen","manchester","cologne","koln","christmas","hour","minute","second","day","week", "year"
+                     "monaco", "oostende","de","city", " city","one","barcelonaturismecom","vimeocomvisitvalencia"]  
+
 print("parameters up to date")

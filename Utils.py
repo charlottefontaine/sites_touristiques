@@ -3,6 +3,14 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import pandas as pd
+import json
+import nltk
+from collections import Counter
+import string
+import re
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
 
 
 #---------------------------------------------------
@@ -169,3 +177,249 @@ def csv_to_json(csv_path, json_path):
     df.to_json(json_path, orient="records", force_ascii=False, indent=2)
     print(f"CSV successfully converted: {json_path}")
     return df  
+
+
+#---------------------------------------------------
+# Part3. CLEANING PHASE BEFORE NLP PROCESSING
+#---------------------------------------------------
+
+
+def tokenize_text(text):
+    tokens = nltk.word_tokenize(text)
+    tokens = [token.lower() for token in tokens]
+    return tokens
+
+
+def tokenize_json_by_city_url(json_path):
+    """
+    Input:
+        json_path: path to JSON file
+    Output:
+        dict with key = (city, url) and value = list of tokens
+    """
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    dict_tokens = {}
+
+    for item in data:
+        if "text" in item and "city" in item and "url" in item:
+            key = (item["city"], item["url"])
+            tokens = tokenize_text(item["text"])
+            dict_tokens[key] = tokens
+
+    return dict_tokens
+
+
+def build_term_document_matrix(documents):
+    """
+    documents : dict
+        key   -> document name (str)
+        value -> list of words (list[str])
+    """
+    vocabulary = sorted(set(
+        word for words in documents.values() for word in words
+    ))
+
+    data = {}
+    for doc_name, words in documents.items():
+        counter = Counter(words)
+        data[doc_name] = [counter.get(word, 0) for word in vocabulary]
+
+    return pd.DataFrame.from_dict(
+        data, orient="index", columns=vocabulary
+    )
+
+
+def clean_term_document_matrix(matrix, corrector=None, keep_numbers=False):
+    """
+    matrix : pd.DataFrame
+        term-document matrix (rows = documents, columns = terms)
+    corrector : function or None
+        optional spell checker
+    keep_numbers : bool
+        keep terms containing digits if True
+    """
+    emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"
+        "\U0001F300-\U0001F5FF"
+        "\U0001F680-\U0001F6FF"
+        "\U0001F700-\U0001F77F"
+        "\U0001F780-\U0001F7FF"
+        "\U0001F800-\U0001F8FF"
+        "\U0001F900-\U0001F9FF"
+        "\U0001FA00-\U0001FAFF"
+        "\U00002700-\U000027BF"
+        "\U000024C2-\U0001F251"
+        "]+",
+        flags=re.UNICODE
+    )
+
+    new_columns = {}
+
+    for term in matrix.columns:
+        term_clean = term.lower()
+        term_clean = emoji_pattern.sub("", term_clean)
+        term_clean = term_clean.replace("\n", " ")  
+        term_clean = term_clean.translate(str.maketrans("", "", string.punctuation + "€'’‘“”"))
+
+        if not keep_numbers and re.search(r"\d", term_clean):
+            continue
+
+        if term_clean.strip() == "":
+            continue
+
+        if corrector is not None:
+            term_clean = corrector(term_clean)
+
+        if term_clean in new_columns:
+            new_columns[term_clean] += matrix[term]
+        else:
+            new_columns[term_clean] = matrix[term].copy()
+
+    return pd.DataFrame(new_columns, index=matrix.index)
+
+
+def normalize_social_media_terms(term_document_matrix):
+    """
+    Normalize concatenated social media strings into
+    generic platform tokens (instagram, facebook, etc.)
+    """
+
+    platforms = {
+        "instagram": r"instagram",
+        "facebook": r"facebook",
+        "twitter": r"(twitter|xcom)",
+        "youtube": r"youtube",
+        "linkedin": r"linkedin",
+        "tiktok": r"tiktok"
+    }
+
+    new_columns = {}
+
+    for term in term_document_matrix.columns:
+        normalized_term = term.lower().strip(", ")
+
+        for platform, pattern in platforms.items():
+            if re.search(pattern, normalized_term):
+                normalized_term = platform
+                break
+
+        if normalized_term in new_columns:
+            new_columns[normalized_term] += term_document_matrix[term]
+        else:
+            new_columns[normalized_term] = term_document_matrix[term].copy()
+
+    return pd.DataFrame(new_columns, index=term_document_matrix.index)
+
+
+
+def remove_nltk_stopwords(matrix, language="english"):
+    """
+    Remove standard NLTK stopwords from matrix
+    """
+    try:
+        stopwords_nltk = set(stopwords.words(language))
+    except LookupError:
+        nltk.download("stopwords")
+        stopwords_nltk = set(stopwords.words(language))
+
+    columns_to_keep = [col for col in matrix.columns if col.lower() not in stopwords_nltk]
+
+    return matrix[columns_to_keep]
+
+
+def remove_project_stopwords(matrix, project_stopwords):
+    """
+    Remove project-specific stopwords
+
+    Parameters
+    ----------
+    matrix : pd.DataFrame
+        term-document matrix (columns = terms)
+    project_stopwords : list or set
+        list of project-specific stopwords
+
+    Returns
+    -------
+    pd.DataFrame
+        cleaned matrix
+    """
+    project_stopwords = {sw.lower().strip() for sw in project_stopwords}
+
+    columns_to_drop = [col for col in matrix.columns if col.lower() in project_stopwords]
+
+    return matrix.drop(columns=columns_to_drop, errors="ignore")
+
+
+def lemmatize_matrix_nltk(matrix):
+    """
+    Lemmatize the term-document matrix
+    """
+    try:
+        lemmatizer = WordNetLemmatizer()
+        lemmatizer.lemmatize("test")
+    except LookupError:
+        nltk.download("wordnet")
+        nltk.download("omw-1.4")
+        lemmatizer = WordNetLemmatizer()
+
+    new_columns = {}
+
+    for term in matrix.columns:
+        lemma = lemmatizer.lemmatize(term)
+        if lemma in new_columns:
+            new_columns[lemma] += matrix[term]
+        else:
+            new_columns[lemma] = matrix[term].copy()
+
+    return pd.DataFrame(new_columns, index=matrix.index)
+
+
+def filter_terms_by_frequency(matrix, min_df=4, max_df_ratio=1.0):
+    """
+    Filter terms by document frequency
+
+    matrix : pd.DataFrame
+        term-document matrix
+    min_df : int
+        minimum number of documents a term must appear in
+    max_df_ratio : float (0 < max_df_ratio <= 1)
+        maximum proportion of documents a term can appear in
+    """
+    n_documents = matrix.shape[0]
+    freq_doc = (matrix > 0).sum(axis=0)
+
+    columns_to_keep = [
+        term for term in matrix.columns
+        if freq_doc[term] >= min_df
+        and freq_doc[term] <= max_df_ratio * n_documents
+    ]
+
+    return matrix[columns_to_keep]
+
+def remove_miniwords(matrix, min_length=2):
+    """
+    Remove terms with length less than min_length
+
+    Parameters
+    ----------
+    matrix : pd.DataFrame
+        term-document matrix (columns = terms)
+    min_length : int
+        minimum length of terms to keep
+
+    Returns
+    -------
+    pd.DataFrame
+        cleaned matrix
+    """
+    columns_to_drop = [col for col in matrix.columns if len(col) < min_length]
+
+    return matrix.drop(columns=columns_to_drop, errors="ignore")
+
+
+
+
+print("finally")
