@@ -420,6 +420,20 @@ def remove_miniwords(matrix, min_length=2):
     return matrix.drop(columns=columns_to_drop, errors="ignore")
 
 
+def get_short_terms(term_document_matrix, max_len=3):
+    """
+    term_document_matrix : pd.DataFrame
+        Term–document matrix
+    max_len : int
+        Maximum term length (default: 2)
+    Output:
+        List of terms with length <= max_len
+    """
+    return [
+        term for term in term_document_matrix.columns
+        if len(term) <= max_len
+    ]
+
 
 
 print("finally")
