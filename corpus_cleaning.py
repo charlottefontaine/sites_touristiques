@@ -1,6 +1,12 @@
 from Utils import *
 from parameters import *
+import pandas as pd 
+import numpy as np 
+from sklearn.feature_extraction.text import TfidfTransformer 
 
+#---------------------------------
+# Part1 . Dimensionality reduction
+#---------------------------------
 
 # dictionary creation
 dict_tokens = tokenize_json_by_city_url("data/processed/corpus_json.json")
@@ -52,43 +58,101 @@ print(f"Term-document matrix shape after removing miniwords: {df_tdm_miniwords_r
 print("Preview after removing miniwords:")      
 print(df_tdm_miniwords_removed.head())
 
+
 # frequency analysis
 df_freq_terms = filter_terms_by_frequency(df_tdm_miniwords_removed)
+
+
 print("Preview of term frequencies:")    
 print(df_freq_terms.head(10))
 print(f"Term-document matrix shape after frequency filtering: {df_freq_terms.shape}")
 print("Preview of term-document matrix after frequency filtering:")
 print(df_freq_terms.head())
 
-df_freq_terms.to_csv('data/processed/df_freq_terms.csv', index=False)
+
+#----------------------
+# Part2 . Exploration 
+#----------------------
 
 # Sum occurrences of each word across all documents
 word_frequencies = df_freq_terms.sum(axis=0)
-
-# Sort by descending frequency and get top 20
-top_20_words_high = word_frequencies.sort_values(ascending=False).head(20)
-print("Top 20 most frequent words:\n", top_20_words_high)
-
-# Sort by ascending frequency and get bottom 50
-top_20_words_low = word_frequencies.sort_values(ascending=True).head(50)
-print("Top 50 least frequent words:\n", top_20_words_low)
-
-def get_short_terms(term_document_matrix, max_len=3):
-    """
-    term_document_matrix : pd.DataFrame
-        Term–document matrix
-    max_len : int
-        Maximum term length (default: 2)
-    Output:
-        List of terms with length <= max_len
-    """
-    return [
-        term for term in term_document_matrix.columns
-        if len(term) <= max_len
-    ]
 
 short_terms = get_short_terms(df_freq_terms, max_len=3)
 print(f"Short terms (length <= 3): {short_terms}")  
 print(f"Number of short terms: {len(short_terms)}")
 
+#-------------------------------
+# Part3 . Csv file modification 
+#-------------------------------
 
+# avoid SettingWithCopyWarning and ensure we have an independent DataFrame 
+df_freq_terms = df_freq_terms.copy() 
+
+# Extraire la ville depuis l'index 
+df_freq_terms["city"] = [t[0] for t in df_freq_terms.index] 
+
+# Réorganiser pour que city soit la première colonne 
+cols = ["city"] + [c for c in df_freq_terms.columns if c != "city"] 
+df_freq_terms = df_freq_terms[cols] 
+
+# Sauvegarde CSV 
+df_freq_terms.to_csv('data/processed/df_freq_terms.csv', index=False) 
+print(f"Filtered term-document matrix saved: {df_freq_terms.shape}") 
+
+# Diagnostics: compute word frequencies only on numeric term columns 
+terms_only = [c for c in df_freq_terms.columns if c != "city"] 
+if len(terms_only) == 0: 
+    print("Warning: no term columns found in df_freq_terms (only 'city' present?)") 
+else: 
+    word_frequencies = df_freq_terms[terms_only].sum(axis=0) 
+    print("Top 20 most frequent words:\n", word_frequencies.sort_values(ascending=False).head(20)) 
+    print("Bottom 20 least frequent words:\n", word_frequencies.sort_values(ascending=True).head(20)) 
+
+# 4. TF-IDF 
+terms_only = [c for c in df_freq_terms.columns if c != "city"] 
+tfidf_transformer = TfidfTransformer(norm='l2', use_idf=True, smooth_idf=True) 
+X_tfidf = tfidf_transformer.fit_transform(df_freq_terms[terms_only].values) 
+df_tfidf = pd.DataFrame( 
+    X_tfidf.toarray(), 
+    columns=terms_only, 
+    index=df_freq_terms.index 
+
+) 
+
+ 
+
+# Ajouter la colonne city 
+
+df_tfidf["city"] = df_freq_terms["city"].values 
+
+ 
+
+print(f"TF-IDF matrix shape: {df_tfidf.shape}") 
+
+print(df_tfidf.head()) 
+
+ 
+
+# 5. Agrégation par ville et normalisation 
+
+tfidf_by_city = df_tfidf.groupby("city").mean() 
+
+tfidf_by_city_norm = tfidf_by_city.div(tfidf_by_city.sum(axis=1), axis=0) 
+
+ 
+
+print("TF-IDF normalized by city:") 
+
+print(tfidf_by_city_norm.head()) 
+
+ 
+
+# Vérification 
+
+row_sums = tfidf_by_city_norm.sum(axis=1) 
+
+print("Sum of normalized TF-IDF per city:", row_sums) 
+
+ 
+
+ 
