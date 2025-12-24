@@ -88,14 +88,13 @@ print(f"Number of short terms: {len(short_terms)}")
 # avoid SettingWithCopyWarning and ensure we have an independent DataFrame 
 df_freq_terms = df_freq_terms.copy() 
 
-# Extraire la ville depuis l'index 
+# Extract the city from the index 
 df_freq_terms["city"] = [t[0] for t in df_freq_terms.index] 
 
-# Réorganiser pour que city soit la première colonne 
+# # Reorganise so that city is the first column 
 cols = ["city"] + [c for c in df_freq_terms.columns if c != "city"] 
 df_freq_terms = df_freq_terms[cols] 
 
-# Sauvegarde CSV 
 df_freq_terms.to_csv('data/processed/df_freq_terms.csv', index=False) 
 print(f"Filtered term-document matrix saved: {df_freq_terms.shape}") 
 
@@ -108,7 +107,12 @@ else:
     print("Top 20 most frequent words:\n", word_frequencies.sort_values(ascending=False).head(20)) 
     print("Bottom 20 least frequent words:\n", word_frequencies.sort_values(ascending=True).head(20)) 
 
-# 4. TF-IDF 
+
+
+#-------------------------------
+# Part4 . TF-IDF matrix
+#-------------------------------
+
 terms_only = [c for c in df_freq_terms.columns if c != "city"] 
 tfidf_transformer = TfidfTransformer(norm='l2', use_idf=True, smooth_idf=True) 
 X_tfidf = tfidf_transformer.fit_transform(df_freq_terms[terms_only].values) 
@@ -119,39 +123,30 @@ df_tfidf = pd.DataFrame(
 
 ) 
 
- 
-
-# Ajouter la colonne city 
-
 df_tfidf["city"] = df_freq_terms["city"].values 
 
- 
-
 print(f"TF-IDF matrix shape: {df_tfidf.shape}") 
-
 print(df_tfidf.head()) 
 
- 
-
-# 5. Agrégation par ville et normalisation 
+# Aggregation by city and standardisation 
 
 tfidf_by_city = df_tfidf.groupby("city").mean() 
-
 tfidf_by_city_norm = tfidf_by_city.div(tfidf_by_city.sum(axis=1), axis=0) 
 
- 
-
 print("TF-IDF normalized by city:") 
-
 print(tfidf_by_city_norm.head()) 
 
- 
-
-# Vérification 
-
+# Verification 
 row_sums = tfidf_by_city_norm.sum(axis=1) 
-
 print("Sum of normalized TF-IDF per city:", row_sums) 
+
+# Save TF-IDF matrices
+df_tfidf.to_csv("data/processed/df_tfidf_documents.csv",index=False)
+print("Saved: data/processed/df_tfidf_documents.csv")
+
+tfidf_by_city_norm.to_csv("data/processed/df_tfidf_by_city.csv")
+print("Saved: data/processed/df_tfidf_by_city.csv")
+
 
  
 
