@@ -1,4 +1,4 @@
-CITIES = {
+CITIES ={
     "Barcelona": "https://www.barcelonaturisme.com/wv3/en/",
     "Lisbon": "https://www.visitlisboa.com/",
     "Rome": "https://www.rome.net/",
@@ -8,15 +8,29 @@ CITIES = {
     "Manchester": "https://www.visitmanchester.com/",
     "Cologne": "https://www.cologne-tourism.com/",
     "Ostend": "https://www.visitoostende.be/en",
-    "Bruges": "https://www.visitbruges.be/en"
-}
+    "Bruges": "https://www.visitbruges.be/en"}
 
 
 REQUEST_TIMEOUT = 10
 
-project_stopwords = ["bruges", "barcelone", "barcelona","lisbon","roma","rome", "antwerpen", "also","many"
-                     "amsterdam","valencia", "copenhagen","manchester","cologne","christmas","hour","minute","second","day","week", "year"
-                     "monaco", "ostende","de","city", "city","one","barcelonaturismecom","vimeocomvisitvalencia","https","popup","submit","button",
-                     "logo", "profile", "newsletter", "subfooter","nav"]  
+project_stopwords = [
+    "bruges", "barcelone", "barcelona","lisbon","roma","rome", "antwerpen", "also","many",
+    "amsterdam","valencia", "copenhagen","manchester","cologne","christmas","hour","minute","second","day","week", "year",
+    "monaco", "ostende","de","city", "city","one","barcelonaturismecom","vimeocomvisitvalencia","https","popup","submit","button",
+    "logo", "profile", "newsletter", "subfooter","nav"
+]
+
+SEA_CITIES = {
+    "Barcelona", "Lisbon", "Copenhagen", "Ostend","Valencia"
+}
+NOSEA_CITIES = {
+    "Rome", "Manchester", "Cologne" , "Amsterdam","Bruges"
+}
+SOUTH_CITIES = {
+    "Barcelona", "Lisbon", "Rome", "Valencia"
+}
+NORTH_CITIES = {
+    "Amsterdam", "Copenhagen", "Manchester", "Cologne", "Ostend", "Bruges"
+}
 
 print("parameters up to date")
