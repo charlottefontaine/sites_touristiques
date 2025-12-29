@@ -93,3 +93,10 @@ for zone, path in corpus_files.items():
     df_zone.to_csv(output_path, index=False)
 
     print(f"Saved: {output_path}")
+
+if __name__ == "__main__":
+    #  build df_freq_terms.csv for LDA analysis
+    dict_tokens_full = tokenize_json_by_city_url("data/processed/corpus_json.json")
+    df_freq_terms_full = main(dict_tokens_full)
+    df_freq_terms_full.to_csv("data/processed/df_freq_terms.csv", index=False)
+    print("Saved global frequency matrix: data/processed/df_freq_terms.csv ")
