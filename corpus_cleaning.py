@@ -128,8 +128,5 @@ for zone, path in corpus_files.items():
 if __name__ == "__main__":
     dict_tokens_full = tokenize_json_by_city_url("data/processed/corpus_json.json")
     df_freq_terms_full = main(dict_tokens_full)
-    df_freq_terms_full.to_csv(
-        "data/processed/df_freq_terms.csv",
-        index=False
-    )
-    print("Saved global frequency matrix: data/processed/df_freq_terms.csv")
+    df_freq_terms_full.to_csv("data/processed/df_freq_terms.csv", index=False)
+    print("Saved global frequency matrix: data/processed/df_freq_terms.csv ")
