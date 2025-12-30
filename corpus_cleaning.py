@@ -100,3 +100,8 @@ if __name__ == "__main__":
     df_freq_terms_full = main(dict_tokens_full)
     df_freq_terms_full.to_csv("data/processed/df_freq_terms.csv", index=False)
     print("Saved global frequency matrix: data/processed/df_freq_terms.csv ")
+
+
+    # compute TF-IDF by city 
+    df_tfidf, tfidf_by_city_norm = compute_tfidf(df_freq_terms_full)
+    plot_top_words_per_city(tfidf_by_city_norm, top_n=10, output_folder="data/processed/text_analysis")
