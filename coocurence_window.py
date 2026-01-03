@@ -14,7 +14,6 @@ from clean_tokens_cooc import load_and_clean_json
 
 
 # PART 1: MATRIX CONSTRUCTION (Sliding Window)
-
 def build_sparse_cooccurrence(token_sequences, window_size=7):
     """
     Creates a sparse co-occurrence matrix using a sliding window.
@@ -117,6 +116,15 @@ def evaluate_network(G):
         modularity = nx.algorithms.community.modularity(G, communities)
     else:
         communities = []
+        
+    
+    nb_nodes = G.number_of_nodes()
+
+    if nb_nodes > 0:
+        largest_cc_size = len(max(nx.connected_components(G), key=len))
+        largest_component_ratio = largest_cc_size / nb_nodes
+    else:
+        largest_component_ratio = 0
 
     return {
         "nodes": G.number_of_nodes(),
@@ -124,8 +132,10 @@ def evaluate_network(G):
         "density": density,
         "modularity": modularity,
         "components": len(components),
-        "communities_count": len(communities)
+        "communities_count": len(communities),
+        "largest_component_ratio": largest_component_ratio
     }
+
 
 def top_n_terms(token_sequences, N=10000):
     from collections import Counter
@@ -143,16 +153,17 @@ def show_communities_by_centrality(G):
     node_degrees = dict(G.degree())
     
     # Show top 10 communities
-    for i, comm in enumerate(communities[:10], start=1): 
+    for i, comm in enumerate(communities, start=1): 
         sorted_terms = sorted(list(comm), key=lambda x: node_degrees[x], reverse=True)
         print(f"\n--- Community {i} ({len(comm)} terms) ---")
         print(", ".join(sorted_terms[:20]))
 
 # PART 4: GEPHI EXPORT
-def export_to_gephi_csv(G, output_folder="gephi_export"):
+def export_to_gephi_csv(G, output_folder="gephi_export", metric_name="similarity"):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-    print(f"Exporting to Gephi format in '{output_folder}'...")
+    
+    print(f"Exporting to Gephi format in '{output_folder}' with suffix '_{metric_name}'...")
     
     if G.number_of_nodes() == 0:
         print("Graph is empty, skipping export.")
@@ -164,7 +175,7 @@ def export_to_gephi_csv(G, output_folder="gephi_export"):
         for node in comm:
             node_community[node] = i
 
-   
+    # Export Nodes
     nodes_data = []
     weighted_degrees = dict(G.degree(weight='weight'))
     for node in G.nodes():
@@ -174,17 +185,23 @@ def export_to_gephi_csv(G, output_folder="gephi_export"):
             "Degree": G.degree(node),
             "Weighted Degree": weighted_degrees.get(node, 0)
         })
-    pd.DataFrame(nodes_data).to_csv(f"{output_folder}/nodes.csv", index=False)
-
     
+    nodes_filename = f"{output_folder}/nodes_{metric_name}.csv"
+    pd.DataFrame(nodes_data).to_csv(nodes_filename, index=False)
+
+    # Export Edges
     edges_data = []
     for u, v, data in G.edges(data=True):
         edges_data.append({
             "Source": u, "Target": v, "Type": "Undirected",
             "Weight": data.get('weight', 1.0)
         })
-    pd.DataFrame(edges_data).to_csv(f"{output_folder}/edges.csv", index=False)
-    print("Export complete.")
+        
+    
+    edges_filename = f"{output_folder}/edges_{metric_name}.csv"
+    pd.DataFrame(edges_data).to_csv(edges_filename, index=False)
+    
+    print(f"Export complete: {nodes_filename}, {edges_filename}")
 
 # PART 5: INTERACTIVE PIPELINE
 def run_pipeline_interactive(json_path, window_size=7, top_N=10000):
@@ -213,11 +230,13 @@ def run_pipeline_interactive(json_path, window_size=7, top_N=10000):
 
     if choice == "1":
         print("\n--> Mode JACCARD selected.")
-        sim_matrix = jaccard_sparse(cooc_csr, min_jaccard=0.08) 
+        sim_matrix = jaccard_sparse(cooc_csr, min_jaccard=0.15) 
+        metric_name = "jaccard"
         
     elif choice == "2":
         print("\n--> Mode COSINE selected.")
         sim_matrix = cosine_sparse_calculation(cooc_csr, min_cosine=0.35)
+        metric_name = "cosine"
         
     else:
         print("Invalid choice. Please restart.")
@@ -237,7 +256,7 @@ def run_pipeline_interactive(json_path, window_size=7, top_N=10000):
     show_communities_by_centrality(G)
 
     # 8. Export
-    export_to_gephi_csv(G, "gephi_export")
+    export_to_gephi_csv(G, "gephi_export", metric_name=metric_name)
 
     return G
 
@@ -248,4 +267,3 @@ if __name__ == "__main__":
         window_size=7,
         top_N=10000
     )
-

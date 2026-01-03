@@ -107,6 +107,7 @@ PROJECT_STOPWORDS_cooc = {
     'also', 'always', 'already', 'almost', 'another', 'around',
     'area', 'city', 'town', 'centre', 'place', 'places',
     'part', 'way', 'well', 'need', 'must', 'tour', 'travel',
+    'relaxing', 'wealth', 'incredible', 'souvenir'
 
 }
 
@@ -192,8 +193,4 @@ def load_and_clean_json(json_path, min_doc_length=10):
             
     print(f"Loaded and cleaned {len(cleaned_sequences)} documents.")
     return cleaned_sequences
-
-
-
-
 
