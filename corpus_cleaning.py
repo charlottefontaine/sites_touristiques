@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfTransformer
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 
 #---------------------------------
 # Part1. Dimensionality reduction
@@ -139,5 +142,16 @@ for zone, path in corpus_files.items():
 
 df_all_cities = pd.concat(all_freq_terms, ignore_index=True)
 df_all_cities.to_csv("data/processed/df_freq_terms_all.csv", index=False)
+
+
+cities = df_all_cities["city"].unique()
+
+for city in cities:
+    df_city = df_all_cities[df_all_cities["city"] == city]
+    terms_only = [c for c in df_city.columns if c != "city"]
+    word_counts = df_city[terms_only].sum(axis=0)
+    top10 = word_counts.sort_values(ascending=False).head(10)
+    print(f"\nTop 10 most frequent words in {city}:")
+    print(top10)
 
 print("Finally")
