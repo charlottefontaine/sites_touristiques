@@ -159,12 +159,15 @@ def show_communities_by_centrality(G):
         print(", ".join(sorted_terms[:20]))
 
 # PART 4: GEPHI EXPORT
-def export_to_gephi_csv(G, output_folder="gephi_export", metric_name="similarity"):
+def export_to_gephi_csv(G, output_folder="gephi_export", metric_name="similarity", suffix=""):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-    
-    print(f"Exporting to Gephi format in '{output_folder}' with suffix '_{metric_name}'...")
-    
+
+    if suffix:
+        print(f"Exporting to Gephi format in '{output_folder}' with suffix '_{metric_name}_{suffix}'...")
+    else:
+        print(f"Exporting to Gephi format in '{output_folder}' with suffix '_{metric_name}'...")
+
     if G.number_of_nodes() == 0:
         print("Graph is empty, skipping export.")
         return
@@ -180,31 +183,40 @@ def export_to_gephi_csv(G, output_folder="gephi_export", metric_name="similarity
     weighted_degrees = dict(G.degree(weight='weight'))
     for node in G.nodes():
         nodes_data.append({
-            "Id": node, "Label": node,
+            "Id": node,
+            "Label": node,
             "Modularity Class": node_community.get(node, 0),
             "Degree": G.degree(node),
-            "Weighted Degree": weighted_degrees.get(node, 0)
+            "Weighted Degree": weighted_degrees.get(node, 0),
         })
-    
-    nodes_filename = f"{output_folder}/nodes_{metric_name}.csv"
-    pd.DataFrame(nodes_data).to_csv(nodes_filename, index=False)
 
+    if suffix:
+        nodes_filename = f"{output_folder}/nodes_{metric_name}_{suffix}.csv"
+    else:
+        nodes_filename = f"{output_folder}/nodes_{metric_name}.csv"
+    pd.DataFrame(nodes_data).to_csv(nodes_filename, index=False)
+    
     # Export Edges
     edges_data = []
     for u, v, data in G.edges(data=True):
         edges_data.append({
-            "Source": u, "Target": v, "Type": "Undirected",
-            "Weight": data.get('weight', 1.0)
+            "Source": u,
+            "Target": v,
+            "Type": "Undirected",
+            "Weight": data.get('weight', 1.0),
         })
-        
-    
-    edges_filename = f"{output_folder}/edges_{metric_name}.csv"
+
+    if suffix:
+        edges_filename = f"{output_folder}/edges_{metric_name}_{suffix}.csv"
+    else:
+        edges_filename = f"{output_folder}/edges_{metric_name}.csv"
     pd.DataFrame(edges_data).to_csv(edges_filename, index=False)
-    
+
     print(f"Export complete: {nodes_filename}, {edges_filename}")
 
+
 # PART 5: INTERACTIVE PIPELINE
-def run_pipeline_interactive(json_path, window_size=7, top_N=10000):
+def run_pipeline_interactive(json_path, window_size=7, top_N=10000, suffix=""):
     # 1. Loading
     print("1. Loading Corpus...")
     token_sequences = load_and_clean_json(json_path)
@@ -222,22 +234,22 @@ def run_pipeline_interactive(json_path, window_size=7, top_N=10000):
     print("  Type '1' for JACCARD (Strict Intersection)")
     print("  Type '2' for COSINE (Vector Similarity)")
     print("="*50)
-    
+
     choice = input("Enter choice (1 or 2): ").strip()
-    
+
     sim_matrix = None
-    min_degree = 5 
+    min_degree = 5
 
     if choice == "1":
         print("\n--> Mode JACCARD selected.")
-        sim_matrix = jaccard_sparse(cooc_csr, min_jaccard=0.15) 
+        sim_matrix = jaccard_sparse(cooc_csr, min_jaccard=0.15)
         metric_name = "jaccard"
-        
+
     elif choice == "2":
         print("\n--> Mode COSINE selected.")
         sim_matrix = cosine_sparse_calculation(cooc_csr, min_cosine=0.35)
         metric_name = "cosine"
-        
+
     else:
         print("Invalid choice. Please restart.")
         return
@@ -256,7 +268,7 @@ def run_pipeline_interactive(json_path, window_size=7, top_N=10000):
     show_communities_by_centrality(G)
 
     # 8. Export
-    export_to_gephi_csv(G, "gephi_export", metric_name=metric_name)
+    export_to_gephi_csv(G, "gephi_export", metric_name=metric_name, suffix=suffix)
 
     return G
 
