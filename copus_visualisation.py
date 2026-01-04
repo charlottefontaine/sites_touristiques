@@ -46,7 +46,7 @@ def save_heatmap_excel(df, output_path):
     wb.save(output_path)
 
 
-df = pd.read_csv("data/processed/df_freq_terms_all.csv")
+df = pd.read_csv("data/processed/df_freq_terms.csv")
 df["Zone"] = df["city"].apply(get_zone)
 terms = [c for c in df.columns if c not in ["city", "Zone"]]
 df[terms] = df[terms].apply(pd.to_numeric, errors='coerce').fillna(0)
