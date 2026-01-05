@@ -118,6 +118,15 @@ Beyond global trends, we analyzed how specific keywords are used in different co
 ### 5. Structural Network (Gephi)
 Mapping the connectivity and content hubs of the analyzed tourist sites.
 ***
+#### 5.1 Bruges in the Shared Lexical Graph
+This projection shows how **Bruges**’ key terms are embedded in the global co‑occurrence network built from all cities’ content. Nodes represent words, edges represent co‑occurrences within a sliding window, and colors indicate communities detected by modularity clustering.
+
+<img width="520" height="280" alt="Bruges shared lexical graph" src="<img width="759" height="715" alt="image" src="https://github.com/user-attachments/assets/ccabd45f-7af6-4c3b-ae6e-21eff6b03a83" />
+" />
+
+**What this graph highlights:**
+- Bruges forms a **dense local community** of toponyms and heritage‑related terms (streets, canals, landmarks), confirming its strong local lexical identity.
+- At the same time, several Bruges nodes connect to the **global backbone** of the network (e.g. culture, museums, restaurants), showing how the city plugs into the common European tourism narrative.
 
 # 💡 Strategic Recommendations
 ##### [:rocket: Go to Contents Overview](#contents-overview)
