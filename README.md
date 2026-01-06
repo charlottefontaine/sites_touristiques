@@ -68,12 +68,64 @@ The project follows a rigorous data pipeline, leveraging Python's most powerful 
 
 # 📂 Repository Structure
 ##### [:rocket: Go to Contents Overview](#contents-overview)
-
+### Data folders
+- **`data/raw/`**  
+  Contains all *unprocessed* inputs scraped from tourism websites.
+  - **`data/raw/html/homepages/`**  
+    Homepage HTML files for each city.
+  - **`data/raw/html/depth1/`**  
+    Depth‑1 HTML files (internal pages linked from the homepage).
+- **`data/processed/`**  
+  Central repository of *cleaned* and *structured* data used as inputs for multiple analyses.
+  - **`data/processed/corpus.csv`**  
+    Flat text corpus (one row per page) with columns such as `city`, `url`, `depth`, `text`, `word_count`.
+  - **`data/processed/corpus_json.json`**  
+    JSON version of the corpus, one object per page, used for flexible text processing.
+  - **`data/processed/corpus_sea.json`, `corpus_nosea.json`, `corpus_north.json`, `corpus_south.json`**  
+    Sub‑corpora for the four geographic / coastal categories (Sea, No‑Sea, North, South).
+  - **`data/processed/df_freq_terms.csv`**  
+    Document–term frequency matrix (rows = pages, columns = terms, plus a `city` column).
+  - **`data/processed/tfidf_by_city_norm.csv`**  
+    City‑level normalized TF‑IDF matrix (rows = cities, columns = terms).
+- **`data/diagnostic/`**   
+  Optional folder for intermediate diagnostic exports (e.g. sparsity reports, Zipf‑law plots, matrix summaries) produced during quality checks.
+- **`data/text_analysis/`**  
+  Outputs from text mining and semantic analyses (TF‑IDF, LDA, N‑grams, clustering, word clouds, concordances, sentiment).
+  - **`data/text_analysis/concordances/`**  
+    KWIC tables for strategic keywords (e.g. `concordance_romantic.csv`, `concordance_shopping.csv`).
+  - **`data/text_analysis/classification/`**  
+    Topic scores per city and dominant topic labels (e.g. `city_topic_scores.csv`, `city_topic_scores.xlsx`).
+  - **`data/text_analysis/lda/`**  
+    LDA‑related exports such as topic–word lists and topic–city heatmaps.
+  - **`data/text_analysis/ngrams/`**  
+    Filtered N‑gram (bigram) tables by theme.
+  - **`data/text_analysis/clustering/`**  
+    Dendrogram and similarity heatmap figures for hierarchical clustering of cities.
+  - **`data/text_analysis/wordclouds/`**  
+    Word cloud images for cities and geographic categories.
+  - **`data/text_analysis/tfidf_top_terms/`**  
+    CSVs and figures with top TF‑IDF terms by city or category.
+- **`data/link_analysis/`**  
+  Outputs related to co‑occurrence graphs and lexical network analysis (web mining part).
+  - **`data/link_analysis/coocurence_window_graph/`**  
+    Node and edge CSVs for the global and category‑specific co‑occurrence graphs (Jaccard / Cosine), plus derived matrices.
+    - `nodes_jaccard.csv`, `edges_jaccard.csv`  
+      Global lexical co‑occurrence graph (Jaccard).
+    - `nodes_cosine.csv`, `edges_cosine.csv`  
+      Global lexical co‑occurrence graph (Cosine).
+    - `nodes_jaccard_sea.csv`, `edges_jaccard_sea.csv`  
+      Co‑occurrence graph restricted to Sea cities (and analogous files for No‑Sea, North, South).
+    - `nodes_jaccard_brugeShare.csv`  
+      Jaccard node file enriched with the `bruges_share` score per term.
+    - `city_community_matrix_jaccard.csv`  
+      City–community weight matrix derived from the global Jaccard graph.
+### Codes
 * **`parameters.py`**: Maps cities to their tourism websites and categorizes them by geography and coastal access.
 * **`Utils.py`**: Tools to scrape tourism websites and preprocess the text for NLP analysis.
 * **`run_scrapping.py`**: Automated harvesting script extracting editorial content from the 10 target cities' tourism websites into a CSV corpus.
 * **`corpus_analysis.py`**: Converts the corpus to JSON and generates an Excel report containing detailed statistical metrics on word counts and page distributions per city.
-* **`corpus_cleaning.py`**: Cleans the text and generates TF-IDF visualizations to identify top keywords across city categories.
+* **`corpus_cleaning.py`**: Cleans the corpus (tokenization, stopwords, lemmatization), builds the document–term frequency matrix `df_freq_terms.csv` and the normalized TF‑IDF matrix by city,
+* generates TF-IDF visualizations to identify top keywords across city categories.
 * **`corpus_check_post_cleaning.py`**: Performs quality control and statistical diagnostics on the cleaned matrix, including sparsity checks and Zipf's Law validation.
 * **`compare_lemmatization_stemming.py`**: Compares lemmatization and stemming methods to evaluate their impact on vocabulary size and matrix sparsity.
 * **`categories_cleaning.py`**: Computes TF-IDF scores and splits the term-document matrix into geographical subsets (North, South, Sea, and No-Sea) for comparative analysis.
@@ -82,21 +134,17 @@ The project follows a rigorous data pipeline, leveraging Python's most powerful 
 *  **`Classification.py`**: Scoring and normalizing TF-IDF topics to confirm LDA results.
 * **`Hyperparams_optimization_hierarchical_clust.py`**: Executes hierarchical clustering and generates dendrograms to visualize city similarities based on diverse distance metrics and linkage methods.
 * **`hierarchical clustering and similarity analysis.py`**: Maps city similarities using cosine heatmaps and hierarchical dendrograms based on TF-IDF profiles.
-* **`Graph source_target_page.py`**: Maps internal link structures to calculate PageRank and centralities, exporting the results for network visualization in Gephi.
 * **`N-grams_analysis.py`**: Extracts and filters word pairs (bigrams) associated with specific tourism themes like "shopping" or "romantic" to identify local strategic trends.
-* **`network_matrix.py`**: Maps TF-IDF word co-occurrences and LDA topics to node/edge files while calculating network metrics for visualization in Gephi.
 * **`coocurence_window.py`**: Builds a sparse co-occurrence matrix using a sliding window to generate Jaccard or Cosine similarity graphs and identifies semantic clusters.
 * **`concordance_analysis.py`**: Generates Keyword-in-Context (KWIC) tables to analyze how specific terms like "romantic" or "shopping" are used across different city subsets.
 * **`co_ocurence.py`**: Transforms a Term-Document Matrix (TDM) into a Jaccard similarity graph, enabling the evaluation of word associations and modularity within the corpus.
 * **`clean_tokens_cooc.py`**: Filters out CSS/HTML technical artifacts, multilingual noise, and generic tourism stopwords while lemmatizing English tokens to prepare a high-quality corpus for co-occurrence analysis.
 * **`categories_coocurence_window.py`**: Automated pipeline for group-based co-occurrence and community analysis.
 * **`Bruge_share_on_graph.py`**: Calculating Bruges' term frequency share for Gephi visualization.
-*  **`Bruge_share_on_graph.py`**: Calculating Bruges' term frequency share for Gephi visualization.
 *  **`graph_evaluation.py`**: CMeasuring graph centrality and semantic distances to evaluate Bruges' competitive positioning.
 *  **`sentiment lexicon analysis.py`**:Comparative sentiment analysis pipeline using VADER and custom emotional lexicons.
-* **`Graph source_target_page.py`**: Analyzing internal link structures and computing graph centrality metrics for Gephi visualization.
 * **`City_community_matrix.py`**: Detecting lexical communities to calculate city-specific weights based on Jaccard co-occurrence graphs.
-
+* **`no_more_useful`**: Folder containing early experimental scripts (e.g. old TF‑IDF/LDA graph integrations, alternative clustering tests,Graph source_target_page) kept for transparency but not used in the final pipeline.
 ***
 
 # 📊 Key Visualizations
