@@ -21,7 +21,6 @@
 - [🛠 Methodology & Pipeline](#-methodology--pipeline)
 - [📂 Repository Structure](#-repository-structure)
 - [📊 Key Visualizations](#-key-visualizations)
-- [💡 Strategic Recommendations](#-strategic-recommendations)
 - [👥 ACE Click Team](#-ace-click-team)
 
 ***
@@ -216,7 +215,6 @@ This projection shows how **Bruges**’ key terms are embedded in the global co�
 - Bruges forms a **dense local community** of toponyms and heritage‑related terms (streets, canals, landmarks), confirming its strong local lexical identity.
 - At the same time, several Bruges nodes connect to the **global backbone** of the network (e.g. culture, museums, restaurants), showing how the city plugs into the common European tourism narrative.
 
-# 💡 Strategic Recommendations
 ##### [:rocket: Go to Contents Overview](#contents-overview)
 
 ***
