@@ -35,6 +35,31 @@ In a European market welcoming over 340 million international tourists, official
 **Cities Analyzed:** Barcelona, Lisbon, Rome, Ostend, Amsterdam, Valencia, Copenhagen, Manchester, Cologne, and **Bruges**.
 
 ***
+# ⚡ Quick Start
+##### [:rocket: Go to Contents Overview](#contents-overview)
+
+This quick start reproduces the full analytical pipeline, from web scraping to semantic and lexical network analysis.
+## Requirements
+Python 3.9+
+
+## Install dependencies
+pip install -r requirements.txt
+
+## Configure cities, websites and categories
+parameters.py
+
+## Scrape tourism websites (depth = 1)
+python run_scrapping.py
+
+## Build, clean and validate the corpus
+python corpus_analysis.py
+python corpus_cleaning.py
+python corpus_check_post_cleaning.py
+## Text Mining, Semantic & Network Analyses
+Once the corpus is cleaned and validated, run the text mining and semantic analysis modules to extract thematic structures (TF-IDF, LDA, N-grams, concordances) and perform clustering and similarity analyses between cities.
+For lexical network analysis, tokens must first be filtered and lemmatized using clean_tokens_cooc.py before running the co-occurrence pipeline (coocurence_window.py and related scripts), which generates Jaccard and Cosine similarity graphs exported for Gephi visualization.
+
+***
 # 🛠 Methodology & Pipeline
 ##### [:rocket: Go to Contents Overview](#contents-overview)
 
