@@ -120,30 +120,36 @@ The project follows a rigorous data pipeline, leveraging Python's most powerful 
     - `city_community_matrix_jaccard.csv`  
       City–community weight matrix derived from the global Jaccard graph.
 ### Codes
+#### 1. Tools
 * **`parameters.py`**: Maps cities to their tourism websites and categorizes them by geography and coastal access.
 * **`Utils.py`**: Tools to scrape tourism websites and preprocess the text for NLP analysis.
+#### 2. Scraping
 * **`run_scrapping.py`**: Automated harvesting script extracting editorial content from the 10 target cities' tourism websites into a CSV corpus.
+#### 3. Corpus treatment
 * **`corpus_analysis.py`**: Converts the corpus to JSON and generates an Excel report containing detailed statistical metrics on word counts and page distributions per city.
 * **`corpus_cleaning.py`**: Cleans the corpus (tokenization, stopwords, lemmatization), builds the document–term frequency matrix `df_freq_terms.csv` and the normalized TF‑IDF matrix by city,
 * generates TF-IDF visualizations to identify top keywords across city categories.
 * **`corpus_check_post_cleaning.py`**: Performs quality control and statistical diagnostics on the cleaned matrix, including sparsity checks and Zipf's Law validation.
 * **`compare_lemmatization_stemming.py`**: Compares lemmatization and stemming methods to evaluate their impact on vocabulary size and matrix sparsity.
 * **`categories_cleaning.py`**: Computes TF-IDF scores and splits the term-document matrix into geographical subsets (North, South, Sea, and No-Sea) for comparative analysis.
+#### 4. Text Mining
 * **`word_clouds.py`**: Generates visual word clouds for each city category to highlight the most frequent terms across geographical zones.
 * **`LDA_analysis.py`**: Performs Latent Dirichlet Allocation to discover thematic topics across the corpus and visualizes their distribution per city using heatmaps.
 *  **`Classification.py`**: Scoring and normalizing TF-IDF topics to confirm LDA results.
 * **`Hyperparams_optimization_hierarchical_clust.py`**: Executes hierarchical clustering and generates dendrograms to visualize city similarities based on diverse distance metrics and linkage methods.
 * **`hierarchical clustering and similarity analysis.py`**: Maps city similarities using cosine heatmaps and hierarchical dendrograms based on TF-IDF profiles.
 * **`N-grams_analysis.py`**: Extracts and filters word pairs (bigrams) associated with specific tourism themes like "shopping" or "romantic" to identify local strategic trends.
-* **`coocurence_window.py`**: Builds a sparse co-occurrence matrix using a sliding window to generate Jaccard or Cosine similarity graphs and identifies semantic clusters.
 * **`concordance_analysis.py`**: Generates Keyword-in-Context (KWIC) tables to analyze how specific terms like "romantic" or "shopping" are used across different city subsets.
-* **`co_ocurence.py`**: Transforms a Term-Document Matrix (TDM) into a Jaccard similarity graph, enabling the evaluation of word associations and modularity within the corpus.
+* **`sentiment lexicon analysis.py`**:Comparative sentiment analysis pipeline using VADER and custom emotional lexicons.
+#### 5. Link analysis
+* **`coocurence_window.py`**: Builds a sparse co-occurrence matrix using a sliding window to generate Jaccard or Cosine similarity graphs and identifies semantic clusters.
 * **`clean_tokens_cooc.py`**: Filters out CSS/HTML technical artifacts, multilingual noise, and generic tourism stopwords while lemmatizing English tokens to prepare a high-quality corpus for co-occurrence analysis.
+* **`co_ocurence.py`**: Transforms a Term-Document Matrix (TDM) into a Jaccard similarity graph, enabling the evaluation of word associations and modularity within the corpus.
 * **`categories_coocurence_window.py`**: Automated pipeline for group-based co-occurrence and community analysis.
 * **`Bruge_share_on_graph.py`**: Calculating Bruges' term frequency share for Gephi visualization.
 *  **`graph_evaluation.py`**: CMeasuring graph centrality and semantic distances to evaluate Bruges' competitive positioning.
-*  **`sentiment lexicon analysis.py`**:Comparative sentiment analysis pipeline using VADER and custom emotional lexicons.
 * **`City_community_matrix.py`**: Detecting lexical communities to calculate city-specific weights based on Jaccard co-occurrence graphs.
+#### 6. unused
 * **`no_more_useful`**: Folder containing early experimental scripts (e.g. old TF‑IDF/LDA graph integrations, alternative clustering tests,Graph source_target_page) kept for transparency but not used in the final pipeline.
 ***
 
