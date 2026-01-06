@@ -36,25 +36,35 @@ In a European market welcoming over 340 million international tourists, official
 **Cities Analyzed:** Barcelona, Lisbon, Rome, Ostend, Amsterdam, Valencia, Copenhagen, Manchester, Cologne, and **Bruges**.
 
 ***
-
 # 🛠 Methodology & Pipeline
 ##### [:rocket: Go to Contents Overview](#contents-overview)
 
-### 1. Data Collection (Web Scraping)
-- **Strategy**: "Wide-but-shallow" crawling (Depth 1) to capture the most strategic content directly highlighted by tourism boards.
-- **Corpus**: 894 documents collected from homepages and primary internal links.
-- **Tools**: `BeautifulSoup`, `Requests`, `Selenium`.
+The project follows a rigorous data pipeline, leveraging Python's most powerful libraries for data science, machine learning, and graph theory.
 
-### 2. NLP & Text Mining
-- **Preprocessing**: Normalization of social media, removal of project-specific stopwords, and advanced **Lemmatization**.
-- **Vectorization**: **TF-IDF** was chosen for its transparency, allowing us to isolate the "lexical DNA" of each city without the "black box" effect of neural models.
-- **Topic Modeling**: Implementation of **Latent Dirichlet Allocation (LDA)** with $k=6$ topics to group content into editorial pillars.
+### 1. Web Scraping & Data Engineering
+- **Strategy**: Automated "Wide-but-shallow" crawling (Depth 1) to target the most strategic content curated by tourism boards.
+- **Data Structuring**: 894 documents processed and organized using `Pandas`, `NumPy`, and `JSON` for structured storage. 
+- **Efficiency**: Management of high-volume extractions with `time` and `os` modules.
+- **Tools**: `BeautifulSoup`, `Requests`, `Selenium`, `Pandas`, `NumPy`, `JSON`.
 
-### 3. Structural Analysis
-- **Link Analysis**: Studying site architecture and page hierarchy.
-- **Network Mapping**: Exporting co-occurrence data to **Gephi** for structural visualization.
 
-***
+### 2. Text Mining & Machine Learning
+- **Preprocessing**: Advanced NLP pipeline using `NLTK`, `re`, and custom `Stopwords`. This includes multilingual noise filtering and advanced **Lemmatization** (benchmarked against Stemming).
+- **Statistical Quality Control**: Validation of the corpus using frequency distributions (`Counter`, `defaultdict`) and Zipf’s Law diagnostics.
+- **Advanced Modeling**:
+  - **Vectorization**: **TF-IDF** calculated from `csr_matrix` and `dok_matrix` (SciPy) for high-dimensional efficiency.
+  - **Thematic Modeling**: **Latent Dirichlet Allocation (LDA)** to discover latent editorial pillars.
+  - **Clustering & Dim. Reduction**: City profile segmentation using **K-Means clustering** and **PCA** (Principal Component Analysis) to visualize cluster variance.
+- **Tools**: `Scikit-learn`, `SciPy`, `NLTK`, `Seaborn`, `Matplotlib`.
+
+
+### 3. Link & Network Analysis
+- **Structural Mapping**: Modeling of site architecture and page hierarchy using `NetworkX` to analyze source-target relationships.
+- **Network Metrics**: 
+  - **Centrality**: Calculation of connectivity scores and **PageRank** to identify content hubs.
+  - **Community Detection**: Implementation of `greedy_modularity_communities` to find thematic clusters within the link structure.
+- **Advanced Graphs**: Exporting co-occurrence data and similarity scores (`cosine_similarity`) for high-fidelity visualization in **Gephi**.
+- **Tools**: `NetworkX`, `SciPy (sparse matrices)`, `Scikit-learn`, `Gephi`.
 
 # 📂 Repository Structure
 ##### [:rocket: Go to Contents Overview](#contents-overview)
