@@ -1,11 +1,38 @@
 """
-note: this script is not to be taken into account in text mining analysis tools for cities. The results obtained do not lead to relevant results.
-Please go to the extended analysis behind, named emotional sentiment lexicon analysis extended
+Part 1: VADER
+    - Calculates sentiment scores (neg, neu, pos, compound) per page.
+    - Save an enriched corpus with sentiment score
+
+Part 2: Extended emotional lexicon
+    - Constructs a profile of emotions per city (joy, fear, etc.).
+    - Save a table aggregated by city.
+
+Inputs
+------
+data/processed/corpus.csv
+
+Outputs
+-------
+data/processed/corpus_with_sentiment.csv
+    Corpus enriched with VADER scores.
+
+data/text_analysis/sentiment/sentiment_profiles_by_city_extended.csv
+    Emotion profiles by city (rate per 1000 words, normalized shares,
+    dominant emotion).
 """
+import os
 import pandas as pd
 from nltk.sentiment import SentimentIntensityAnalyzer
 import nltk
 
+BASE_DIR = "data"
+PROCESSED_DIR = os.path.join(BASE_DIR, "processed")
+SENTIMENT_DIR = os.path.join(BASE_DIR, "text_analysis", "sentiment")
+
+os.makedirs(PROCESSED_DIR, exist_ok=True)
+os.makedirs(SENTIMENT_DIR, exist_ok=True)
+
+## PART 1 : VADER
 # 1. Load VADER
 try:
     nltk.data.find('sentiment/vader_lexicon.zip')
@@ -50,17 +77,12 @@ sentiment_by_city = (
 
 print(sentiment_by_city)
 
-
-"""
-Emotional sentiment analysis extended which complete and give more relevant results than the simple one.
-"""
-
-## sentiment analysis extended 
+##PART 2 : emotional profile per city 
 import os
 import re
 import numpy as np
 
-BASE_PATH = "data/processed"
+BASE_PATH = "data/text_analysis"
 CORPUS_PATH = os.path.join(BASE_PATH, "corpus.csv")
 OUTPUT_DIR = "data/sentiment_lexicon"
 os.makedirs(OUTPUT_DIR, exist_ok=True)

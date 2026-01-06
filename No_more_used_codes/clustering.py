@@ -1,3 +1,9 @@
+"""
+Experimental word clustering on the cleaned frequency matrix (df_freq_terms).
+Status
+- This was an exploratory analysis and is no longer part of the main pipeline.
+- Kept only as a reference / archive of early experiments.
+"""
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans

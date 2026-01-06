@@ -1,3 +1,15 @@
+"""
+Diagnostics on the cleaned term–document matrix.
+
+The analyses include:
+- A basic matrix profile (number of documents, vocabulary size, sparsity).
+- Distribution of document lengths (total word counts per document) with a histogram.
+- Term frequency distribution to inspect Zipf's law on a log–log plot.
+- Distribution of term lengths (number of characters) to verify removal of very short terms.
+
+All diagnostic plots are saved in `data/diagnostics` as PNG files.
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -148,7 +160,8 @@ def main():
         return
 
     print(f"Loading data from {TDM_PATH}...")
-    tdm = pd.read_csv(TDM_PATH, index_col=0)
+    df_full = pd.read_csv(TDM_PATH)
+    tdm = df_full.drop(columns=["city"])
     print("Data loaded successfully.\n")
 
     # Run diagnostics
@@ -159,3 +172,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

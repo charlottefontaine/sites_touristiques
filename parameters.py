@@ -1,3 +1,10 @@
+"""
+Global configuration for the project:
+- list of cities and URLs
+- scraping timeout
+- project-specific stopwords
+- city groups (sea / no sea / north / south)
+"""
 CITIES ={
     "Barcelona": "https://www.barcelonaturisme.com/wv3/en/",
     "Lisbon": "https://www.visitlisboa.com/",
@@ -10,7 +17,7 @@ CITIES ={
     "Ostend": "https://www.visitoostende.be/en",
     "Bruges": "https://www.visitbruges.be/en"}
 
-
+#stopwords specific to this project
 REQUEST_TIMEOUT = 10
 
 project_stopwords = [
@@ -20,6 +27,7 @@ project_stopwords = [
     "logo", "profile", "newsletter", "subfooter","nav","dec","main"
 ]
 
+#city group
 SEA_CITIES = {
     "Barcelona", "Lisbon", "Copenhagen", "Ostend","Valencia"
 }

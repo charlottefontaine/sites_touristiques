@@ -1,17 +1,37 @@
-import pandas as pd
+"""
+corpus_visualisation.py
+
+Builds Excel heatmaps for:
+- top 10 most frequent words per city (global + by zone),
+- LDA topic proportions per city (global + by zone).
+
+Inputs
+------
+data/processed/df_freq_terms.csv
+    Document-term matrix with a 'city' column.
+
+Outputs
+-------
+data/text_analysis/heatmaps/heatmap_words_{GLOBAL|SEA|NOSEA|NORTH|SOUTH}.xlsx
+data/text_analysis/heatmaps/heatmap_topics_{GLOBAL|SEA|NOSEA|NORTH|SOUTH}.xlsx
+"""
+
+import os
 import numpy as np
-from sklearn.decomposition import LatentDirichletAllocation
+import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill
-import os
+
+from parameters import SEA_CITIES, NOSEA_CITIES, NORTH_CITIES, SOUTH_CITIES
+
+BASE_DIR = "data"
+PROCESSED_DIR = os.path.join(BASE_DIR, "processed")
+HEATMAP_DIR = os.path.join(BASE_DIR, "text_analysis", "heatmaps")
+
+os.makedirs(HEATMAP_DIR, exist_ok=True)
 
 
-SEA_CITIES = {"Barcelona", "Lisbon", "Copenhagen", "Ostend", "Valencia"}
-NOSEA_CITIES = {"Rome", "Manchester", "Cologne", "Amsterdam", "Bruges"}
-NORTH_CITIES = {"Amsterdam", "Copenhagen", "Manchester", "Cologne", "Ostend", "Bruges"}
-SOUTH_CITIES = {"Barcelona", "Lisbon", "Rome", "Valencia"}
-
-def get_zone(city):
+def get_zone(city: str) -> str:
     if city in SEA_CITIES:
         return "SEA"
     if city in NOSEA_CITIES:
@@ -22,16 +42,17 @@ def get_zone(city):
         return "SOUTH"
     return "Other"
 
-# ---------------
-# Heatmap excel
-# ---------------
-def save_heatmap_excel(df, output_path):
+
+def save_heatmap_excel(df: pd.DataFrame, output_path: str) -> None:
+    """
+    Apply a simple color scale on numeric cells in an existing Excel file.
+    """
     wb = load_workbook(output_path)
     ws = wb.active
+
     df_numeric = df.select_dtypes(include=[np.number])
-    
     if df_numeric.empty:
-        print("no numeric data")
+        print("No numeric data to color in heatmap.")
         return
 
     max_val = df_numeric.to_numpy().max()
@@ -40,54 +61,46 @@ def save_heatmap_excel(df, output_path):
         for cell in row:
             if isinstance(cell.value, (int, float)):
                 intensity = int(255 * cell.value / max_val) if max_val else 0
-                color = f"FF{255-intensity:02X}{255-intensity:02X}"
-                cell.fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
+                color = f"FF{255 - intensity:02X}{255 - intensity:02X}"
+                cell.fill = PatternFill(
+                    start_color=color, end_color=color, fill_type="solid"
+                )
 
     wb.save(output_path)
 
 
-df = pd.read_csv("data/processed/df_freq_terms.csv")
-df["Zone"] = df["city"].apply(get_zone)
-terms = [c for c in df.columns if c not in ["city", "Zone"]]
-df[terms] = df[terms].apply(pd.to_numeric, errors='coerce').fillna(0)
-os.makedirs("data/processed", exist_ok=True)
+def main():
+    # Load global df_freq_terms
+    freq_path = os.path.join(PROCESSED_DIR, "df_freq_terms.csv")
+    if not os.path.exists(freq_path):
+        raise FileNotFoundError(
+            f"{freq_path} not found. Run corpus_cleaning.py first."
+        )
 
-# -----------------------------
-# PART 1 : Word Heatmap
-# -----------------------------
-def word_heatmap(data, name):
-    freq = data[terms].sum().sort_values(ascending=False).head(10)
-    df_hm = data.groupby("city")[freq.index].sum()
-    path = f"data/processed/heatmap_words_{name}.xlsx"
-    df_hm.to_excel(path)
-    save_heatmap_excel(df_hm, path)
+    df = pd.read_csv(freq_path)
+    if "city" not in df.columns:
+        raise ValueError("Expected 'city' column in df_freq_terms.csv")
 
-word_heatmap(df, "GLOBAL")
-for zone in ["SEA", "NOSEA", "NORTH", "SOUTH"]:
-    word_heatmap(df[df["Zone"] == zone], zone)
+    df["Zone"] = df["city"].apply(get_zone)
+    terms = [c for c in df.columns if c not in ["city", "Zone"]]
+    df[terms] = df[terms].apply(pd.to_numeric, errors="coerce").fillna(0)
 
-# ---------------------------------
-# PART 2 : Heatmap for topics (LDA)
-# ---------------------------------
-tdm = df[terms].values
-cities = df["city"].values
+    # -----------------------------
+    # PART 1 : Word heatmaps
+    # -----------------------------
+    def word_heatmap(data: pd.DataFrame, name: str):
+        freq = data[terms].sum().sort_values(ascending=False).head(10)
+        df_hm = data.groupby("city")[freq.index].sum()
+        path = os.path.join(HEATMAP_DIR, f"heatmap_words_{name}.xlsx")
+        df_hm.to_excel(path)
+        save_heatmap_excel(df_hm, path)
+        print(f"Word heatmap saved to {path}")
 
-lda = LatentDirichletAllocation(n_components=6, random_state=42)
-doc_topic = lda.fit_transform(tdm)
+    # Global
+    word_heatmap(df, "GLOBAL")
+    # By zone
+    for zone in ["SEA", "NOSEA", "NORTH", "SOUTH"]:
+        word_heatmap(df[df["Zone"] == zone], zone)
 
-df_topics = pd.DataFrame(doc_topic, columns=[f"Topic_{i}" for i in range(6)])
-df_topics["city"] = cities
-df_topics["Zone"] = df_topics["city"].apply(get_zone)
-
-def topic_heatmap(data, name):
-    df_hm = data.groupby("city").mean()
-    df_hm = df_hm.div(df_hm.sum(axis=1), axis=0)
-    path = f"data/processed/heatmap_topics_{name}.xlsx"
-    df_hm.to_excel(path)
-    save_heatmap_excel(df_hm, path)
-
-topic_heatmap(df_topics.drop(columns="Zone"), "GLOBAL")
-for zone in ["SEA", "NOSEA", "NORTH", "SOUTH"]:
-    topic_heatmap(df_topics[df_topics["Zone"] == zone].drop(columns="Zone"), zone)
-
-print("Finally")
+if __name__ == "__main__":
+    main()

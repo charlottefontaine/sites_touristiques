@@ -1,3 +1,18 @@
+"""
+N-grams_analysis.py
+
+Builds cleaned bigrams by city and extracts the bigrams
+"strategic" containing certain keywords.
+
+Input
+-----
+data/processed/corpus_json.json
+
+Outputs
+-------
+data/text_analysis/bigrams/bigrams_{City}_strategic.csv
+    Columns: word1, word2, frequency.
+"""
 import os
 import re
 from collections import Counter, defaultdict
@@ -10,10 +25,15 @@ from nltk.util import bigrams
 from Utils import tokenize_json_by_city_url
 from parameters import project_stopwords
 
+BASE_DIR = "data"
+PROCESSED_DIR = os.path.join(BASE_DIR, "processed")
+TEXT_ANALYSIS_DIR = os.path.join(BASE_DIR, "text_analysis", "bigrams")
 
-BASE_PATH = "data/processed"
-JSON_PATH = os.path.join(BASE_PATH, "corpus_json.json")
-OUTPUT_PREFIX = BASE_PATH  # fichiers CSV dans data/processed
+JSON_PATH = os.path.join(PROCESSED_DIR, "corpus_json.json")
+OUTPUT_PREFIX = TEXT_ANALYSIS_DIR  
+
+os.makedirs(PROCESSED_DIR, exist_ok=True)
+os.makedirs(TEXT_ANALYSIS_DIR, exist_ok=True)
 
 
 # Stopwords

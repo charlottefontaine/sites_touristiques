@@ -1,3 +1,37 @@
+"""
+Builds a lexical co-occurrence network using a sliding window over tokens and exports it to Gephi-compatible CSVs.
+
+The script:
+- loads and cleans the corpus from a JSON file (one document per page),
+- keeps only the top-N most frequent tokens,
+- builds a symmetric sparse co-occurrence matrix with a sliding window,
+- converts it to a similarity matrix using either Jaccard or Cosine,
+- constructs an undirected NetworkX graph, evaluates basic network metrics,
+- shows a preview of communities, and exports nodes/edges CSVs for Gephi.
+
+Inputs
+- json_path :
+    Path to the cleaned corpus JSON, e.g. "data/processed/corpus_json.json".
+    The JSON is loaded and preprocessed by load_and_clean_json from clean_tokens_cooc.
+- Parameters:
+    window_size (int): size of the sliding window for co-occurrence.
+    top_N (int): number of most frequent tokens to keep.
+    suffix (str): optional suffix to differentiate runs (e.g. "global", "sea").
+    Interactive choice between:
+        1 = Jaccard similarity on binarized co-occurrence.
+        2 = Cosine similarity on the co-occurrence matrix.
+
+Outputs
+- CSV files (Gephi-ready) written to:
+    data/link_analysis/coocurence_window_graph/nodes_{metric_name}_{suffix}.csv
+    data/link_analysis/coocurence_window_graph/edges_{metric_name}_{suffix}.csv
+  where metric_name ∈ {"jaccard", "cosine"} and suffix is optional.
+- Console output:
+    Basic network metrics (nodes, edges, density, modularity, etc.)
+    Text preview of top terms per community by degree.
+- Return value:
+    The constructed NetworkX graph G.
+"""
 import json
 import pandas as pd
 import numpy as np
@@ -159,7 +193,12 @@ def show_communities_by_centrality(G):
         print(", ".join(sorted_terms[:20]))
 
 # PART 4: GEPHI EXPORT
-def export_to_gephi_csv(G, output_folder="gephi_export", metric_name="similarity", suffix=""):
+def export_to_gephi_csv(
+    G,
+    output_folder="data/link_analysis/coocurence_window_graph",
+    metric_name="similarity",
+    suffix="",
+):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
@@ -268,7 +307,7 @@ def run_pipeline_interactive(json_path, window_size=7, top_N=10000, suffix=""):
     show_communities_by_centrality(G)
 
     # 8. Export
-    export_to_gephi_csv(G, "gephi_export", metric_name=metric_name, suffix=suffix)
+    export_to_gephi_csv(G, metric_name=metric_name, suffix=suffix)
 
     return G
 

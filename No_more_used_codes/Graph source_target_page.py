@@ -1,5 +1,30 @@
-# file: link_analysis.py
+"""
+Complementary link-structure analysis of the tourism websites.
+This analysis is complementary and exploratory: it did not yield
+decisive insights in the final report
+- reconstructs internal links between pages from the saved HTML files (homepages and depth-1 pages),
+- builds a directed graph per city (pages = nodes, internal links = edges),
+- computes in-degree, out-degree, PageRank and closeness for each page,
+- exports per-city node/edge CSVs for Gephi.
 
+Inputs
+------
+data/raw/html/homepages/{city}.html
+data/raw/html/depth1/{city}_{hash}.html
+data/processed/corpus.csv (used to map depth-1 HTML files back to their URLs)
+
+Outputs
+-------
+data/processed/links.csv
+    All internal links per city (city, source_url, target_url).
+
+data/processed/graph_metrics.csv
+    Per-page metrics: in_degree, out_degree, PageRank, closeness.
+
+data/processed/gephi/nodes_{city}.csv
+data/processed/gephi/edges_{city}.csv
+    Gephi-ready files for each city's internal link graph.
+"""
 import os
 from urllib.parse import urlparse
 
@@ -15,9 +40,12 @@ HTML_HOMEPAGES_DIR = os.path.join(BASE_OUTPUT, "html", "homepages")
 HTML_DEPTH1_DIR = os.path.join(BASE_OUTPUT, "html", "depth1")
 PROCESSED_DIR = os.path.join(BASE_OUTPUT, "processed")
 
-LINKS_CSV = os.path.join(PROCESSED_DIR, "links.csv")
-GRAPH_METRICS_CSV = os.path.join(PROCESSED_DIR, "graph_metrics.csv")
-GEPHI_EXPORT_DIR = os.path.join(PROCESSED_DIR, "gephi")
+LINK_ANALYSIS_DIR = os.path.join(BASE_OUTPUT, "link_analysis", "graph_structure")
+os.makedirs(LINK_ANALYSIS_DIR, exist_ok=True)
+
+LINKS_CSV = os.path.join(LINK_ANALYSIS_DIR, "links.csv")
+GRAPH_METRICS_CSV = os.path.join(LINK_ANALYSIS_DIR, "graph_metrics.csv")
+GEPHI_EXPORT_DIR = os.path.join(LINK_ANALYSIS_DIR, "gephi")
 
 
 def degree_matrix(A: np.ndarray, direction: str = "out") -> np.ndarray:

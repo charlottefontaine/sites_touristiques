@@ -1,3 +1,29 @@
+"""
+city_community_weights_jaccard.py
+
+Builds a city–community matrix from the global Jaccard co-occurrence graph.
+
+The script:
+- loads the global word co-occurrence graph (Jaccard) exported for Gephi,
+- loads the term-frequency matrix with a 'city' column (df_freq_terms.csv),
+- aggregates term frequencies by city,
+- computes, for each city and each word community, the share of frequency
+  devoted to that community (row-normalized),
+- exports a city x community weight matrix as CSV.
+
+Inputs
+------
+- data/link_analysis/coocurence_window_graph/nodes_jaccard.csv
+- data/link_analysis/coocurence_window_graph/edges_jaccard.csv
+    (Gephi exports from the sliding-window co-occurrence script)
+- data/processed/df_freq_terms.csv
+    Document-term frequency matrix with a 'city' column.
+
+Outputs
+-------
+- data/link_analysis/coocurence_window_graph/city_community_weights_jaccard.csv
+    Rows = cities, columns = Community_k, values = normalized weights per city.
+"""
 import pandas as pd
 import numpy as np
 import networkx as nx
@@ -84,8 +110,8 @@ def compute_city_community_matrix(G: nx.Graph,
 
 
 def main():
-    nodes_path = "gephi_export/nodes_jaccard.csv"
-    edges_path = "gephi_export/edges_jaccard.csv"
+    nodes_path = "data/link_analysis/coocurence_window_graph/nodes_jaccard.csv"
+    edges_path = "data/link_analysis/coocurence_window_graph/edges_jaccard.csv"
     G = load_graph_jaccard(nodes_path, edges_path)
 
     df_freq = load_freq_matrix("data/processed/df_freq_terms.csv")
@@ -93,7 +119,7 @@ def main():
 
     df_city_comm = compute_city_community_matrix(G, df_city_terms)
 
-    output_path = "data/city_community_weights_jaccard.csv"
+    output_path = "data/link_analysis/coocurence_window_graph/city_community_weights_jaccard.csv"
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df_city_comm.to_csv(output_path, index=True)
 

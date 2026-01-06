@@ -1,3 +1,26 @@
+"""
+Creates an LDA topic modeling on the df_freq_terms.csv matrix:
+- evaluates several values ​​of k (2 to 10) via log-likelihood and perplexity,
+- inspects the top words per topic for a few k,
+- trains a final model (k = 6) and aggregates the distributions of topics by city,
+- saves the results and a heatmap.
+
+Input
+-----
+data/processed/df_freq_terms.csv
+    Documents x terms matrix, with a 'city' column.
+
+Outputs
+-------
+data/text_analysis/lda/lda_metrics.png
+    Scores (log-likelihood, perplexity) as a function of k.
+
+data/text_analysis/lda/city_topic_distribution.csv
+    Cities x topics matrix (rows normalized to 1).
+
+data/text_analysis/lda/city_topic_heatmap.png
+    Heatmap of topic proportions by city.
+"""
 import os
 import numpy as np
 import pandas as pd
@@ -6,11 +29,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # topic_modeling : Latent Dirichlet Allocation
+BASE_DIR = "data"
+PROCESSED_DIR = os.path.join(BASE_DIR, "processed")
+LDA_DIR = os.path.join(BASE_DIR, "text_analysis", "lda")
 
-BASE_PATH = "data/processed"
-FREQ_TDM_PATH = os.path.join(BASE_PATH, "df_freq_terms.csv")
-OUTPUT_DIR = "data/topics"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+FREQ_TDM_PATH = os.path.join(PROCESSED_DIR, "df_freq_terms.csv")
+os.makedirs(LDA_DIR, exist_ok=True)
 
 def load_term_document_matrix(csv_path: str):
     """

@@ -1,4 +1,23 @@
-## hierarchical clustering and cities similarity 
+"""
+Calculates the similarity between cities from their TF-IDF profiles
+and performs hierarchical clustering.
+
+Input
+-----
+data/processed/tfidf_by_city_norm.csv
+    Cities x terms matrix (rows normalized to 1).
+
+Outputs
+-------
+data/text_analysis/city_similarity/city_similarity_matrix.csv
+    Cosine similarity matrix between cities.
+
+data/text_analysis/city_similarity/city_similarity_heatmap.png
+    Heatmap of cosine similarities.
+
+data/text_analysis/city_similarity/city_dendrogram.png
+    Dendrogram of hierarchical clustering (Ward) of cities.
+"""
 import os
 import pandas as pd
 import numpy as np
@@ -7,9 +26,12 @@ import seaborn as sns
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.cluster.hierarchy import linkage, dendrogram
 
-BASE_PATH = "data/processed"
-TFIDF_CITY_PATH = os.path.join(BASE_PATH, "tfidf_by_city_norm.csv")  # à adapter si besoin
-OUTPUT_DIR = "data/city_similarity"
+BASE_DIR = "data"
+PROCESSED_DIR = os.path.join(BASE_DIR, "processed")
+TFIDF_CITY_PATH = os.path.join(PROCESSED_DIR, "tfidf_by_city_norm.csv")
+OUTPUT_DIR = os.path.join(BASE_DIR, "text_analysis", "city_similarity")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -17,11 +39,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 def load_tfidf_by_city(path: str) -> pd.DataFrame:
     """
     Load the city-level TF-IDF matrix.
-    Expected: rows = cities, columns = terms.
     """
     df = pd.read_csv(path, index_col=0)
     return df
-
 
 def compute_similarity_matrix(df_tfidf_city: pd.DataFrame) -> pd.DataFrame:
     """
@@ -34,7 +54,6 @@ def compute_similarity_matrix(df_tfidf_city: pd.DataFrame) -> pd.DataFrame:
     cities = df_tfidf_city.index.tolist()
     df_sim = pd.DataFrame(sim, index=cities, columns=cities)
     return df_sim
-
 
 def plot_similarity_heatmap(df_sim: pd.DataFrame):
     """
@@ -49,7 +68,6 @@ def plot_similarity_heatmap(df_sim: pd.DataFrame):
     plt.savefig(path)
     plt.show()
     print(f"Heatmap saved to: {path}")
-
 
 def plot_city_dendrogram(df_tfidf_city: pd.DataFrame):
     """
@@ -67,10 +85,9 @@ def plot_city_dendrogram(df_tfidf_city: pd.DataFrame):
     plt.show()
     print(f"Dendrogram saved to: {path}")
 
-
 def main():
     if not os.path.exists(TFIDF_CITY_PATH):
-        print(f"Error: {TFIDF_CITY_PATH} not found. Save tfidf_by_city_norm to CSV first.")
+        print(f"Error: {TFIDF_CITY_PATH} not found.")
         return
 
     df_tfidf_city = load_tfidf_by_city(TFIDF_CITY_PATH)
@@ -88,7 +105,6 @@ def main():
     # 2. Visualizations
     plot_similarity_heatmap(df_sim)
     plot_city_dendrogram(df_tfidf_city)
-
 
 if __name__ == "__main__":
     main()

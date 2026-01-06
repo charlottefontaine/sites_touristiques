@@ -1,3 +1,27 @@
+"""
+Builds a term-term co-occurrence network from the cleaned term-document matrix
+(df_freq_terms.csv) and evaluates its basic structural properties.
+
+The script:
+- loads a term-document matrix (documents x terms) from a CSV file,
+- binarizes term presence and builds a term-term co-occurrence matrix,
+- converts co-occurrence counts into a Jaccard similarity matrix,
+- builds an undirected NetworkX graph with edges above a Jaccard threshold,
+- removes low-degree nodes and computes network metrics.
+
+Inputs
+- csv_path (run_cooccurrence_pipeline argument):
+    Path to the term-document matrix CSV, e.g. "data/processed/df_freq_terms.csv".
+    Expected format: rows = documents, columns = terms, numeric counts.
+
+Outputs
+- Return values:
+    G : networkx.Graph
+        The co-occurrence graph (terms as nodes, Jaccard as edge weight).
+    results : dict
+        Basic network metrics (nodes, edges, density, components, communities, modularity).
+Prints a summary of the computed metrics.
+"""
 import pandas as pd
 import numpy as np
 import networkx as nx

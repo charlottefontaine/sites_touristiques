@@ -1,11 +1,29 @@
+"""
+tfidf_topic_graph.py
+
+Experimental script (not used in the main analysis) which:
+- constructs a co-occurrence graph on the top TF-IDF terms by city,
+- labels words by LDA topic (TOPIC_LABELS / TOPIC_KEYWORDS),
+- exports Gephi files (nodes/edges) and global network metrics.
+
+Inputs
+------
+data/processed/df_tfidf_by_city.csv
+
+Outputs
+-------
+data/processed/gephi_nodes_tfidf_topics.csv
+data/processed/gephi_edges_tfidf_topics.csv
+"""
+
 import pandas as pd
 import os
 import csv
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INPUT_TFIDF = os.path.join(BASE_DIR, "data", "processed", "df_tfidf_by_city.csv")
-OUTPUT_NODES = os.path.join(BASE_DIR, "data", "processed", "gephi_nodes.csv")
-OUTPUT_EDGES = os.path.join(BASE_DIR, "data", "processed", "gephi_edges.csv")
+OUTPUT_NODES = os.path.join(BASE_DIR, "data", "processed", "gephi_nodes_tfidf_topics.csv")
+OUTPUT_EDGES = os.path.join(BASE_DIR, "data", "processed", "gephi_edges_tfidf_topics.csv")
 
 # Topics LDA pour la correspondance
 TOPIC_LABELS = {

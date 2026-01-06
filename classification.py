@@ -1,3 +1,29 @@
+"""
+Auxiliary script to validate LDA themes by computing topic scores per city.
+
+The script:
+- loads the TF-IDF matrix aggregated by city (df_tfidf_by_city.csv),
+- defines 6 hand-crafted topic word lists matching the LDA topics,
+- computes, for each city, a raw score per topic (sum of TF-IDF over topic words),
+- row-normalizes scores so that each city's topic scores sum to 1,
+- identifies the dominant topic per city,
+- exports the normalized topic scores and dominant topic to Excel and CSV.
+
+Inputs
+------
+data/processed/df_tfidf_by_city.csv
+    Rows: cities, columns: terms, values: TF-IDF scores.
+
+Outputs
+-------
+data/processed/city_topic_scores.xlsx
+data/processed/city_topic_scores.csv
+
+Status
+------
+Complementary / validation analysis used to check that the LDA themes
+match intuitive topic-word groups. 
+"""
 import pandas as pd
 import numpy as np
 
@@ -86,10 +112,10 @@ topic_scores_norm["dominant_topic"] = topic_scores_norm.idxmax(axis=1)
 print("\nDominant topic per city:")
 print(topic_scores_norm["dominant_topic"])
 
-OUTPUT_PATH_XLSX = "data/processed/city_topic_scores.xlsx"
+OUTPUT_PATH_XLSX = "data/text_analysis/classification/city_topic_scores.xlsx"
 topic_scores_norm.to_excel(OUTPUT_PATH_XLSX, index=True)
 print(f"\nSaved Excel file with topic scores: {OUTPUT_PATH_XLSX}")
 
-OUTPUT_PATH = "data/processed/city_topic_scores.csv"
+OUTPUT_PATH = "data/text_analysis/classification/city_topic_scores.csv"
 topic_scores_norm.to_csv(OUTPUT_PATH)
 print(f"\nSaved: {OUTPUT_PATH}")

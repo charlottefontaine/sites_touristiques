@@ -1,8 +1,31 @@
+"""
+Evaluate Jaccard- and cosine-based cooccurrence graphs exported from Gephi.
+
+- loads Gephi node/edge CSVs and builds a NumPy adjacency matrix and a NetworkX graph,
+- computes degree and PageRank (on the adjacency matrix),
+- computes betweenness centrality on a distance-transformed graph,
+- analyzes shortest-path distances between a target city (Bruges) and competitor cities,
+  both for the Jaccard and cosine cooccurrence graphs.
+
+Inputs
+------
+data/link_analysis/cooccurrence_window/gephi_export/nodes_jaccard.csv
+data/link_analysis/cooccurrence_window/gephi_export/edges_jaccard.csv
+data/link_analysis/cooccurrence_window/gephi_export/nodes_cosine.csv
+data/link_analysis/cooccurrence_window/gephi_export/edges_cosine.csv
+
+Outputs
+-------
+results are printed in the console
+(top nodes by degree/PageRank/betweenness and shortest paths from Bruges).
+"""
+
 import pandas as pd
 import numpy as np
 import networkx as nx
 import os
 import time
+
 
 
 # 1. DATA LOADING (PANDAS -> NUMPY/NETWORKX)

@@ -1,3 +1,8 @@
+"""
+Utility functions for:
+- web scraping (requests, HTML parsing, link extraction),
+- building and cleaning term-document matrices for NLP.
+"""
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -10,8 +15,6 @@ import string
 import re
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-
-
 
 #---------------------------------------------------
 # Part1. WEB SCRAPING UTILITIES
@@ -168,8 +171,7 @@ def build_dataframe(pages: list) -> pd.DataFrame:
 
 def csv_to_json(csv_path, json_path):
     """
-    Convert CSV file to JSON, it allows us to reuse the corpus in different formats
-    without rerunning the scraping process.
+    Convert CSV file to JSON and return the DataFrame
     """
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"{csv_path} not found")

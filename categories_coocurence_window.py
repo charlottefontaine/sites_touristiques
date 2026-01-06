@@ -1,7 +1,30 @@
+"""
+Runs the sliding-window co-occurrence graph pipeline separately
+for each city category (sea, nosea, north, south).
+
+The script:
+- for each existing category corpus, calls run_pipeline_interactive from
+  coocurence_window.py with a fixed window size and top-N terms,
+- passes a suffix equal to the category name so that all Gephi exports
+  are tagged accordingly.
+
+Inputs
+------
+- data/processed/corpus_sea.json
+- data/processed/corpus_nosea.json
+- data/processed/corpus_north.json
+- data/processed/corpus_south.json
+    (cleaned corpora by category, one document per page)
+
+Outputs
+-------
+For each category where the corpus file exists, the script triggers:
+- data/link_analysis/coocurence_window_graph/nodes_{metric}_{category}.csv
+- data/link_analysis/coocurence_window_graph/edges_{metric}_{category}.csv
+where metric ∈ {"jaccard", "cosine"} and category ∈ {"sea", "nosea", "north", "south"}.
+"""
 import os
 from coocurence_window import run_pipeline_interactive  
-
-# creating coocurence graph  and community per categories
 
 CORPUS_FILES = {
     "sea":   "data/processed/corpus_sea.json",

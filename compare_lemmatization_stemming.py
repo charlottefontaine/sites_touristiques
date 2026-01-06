@@ -1,10 +1,8 @@
-# ===================================================
-# COMPARISON LEMMATIZATION VS STEMMING
-# ===================================================
-# This script is used for methodological comparison.
-# The selected method will be integrated in the final pipeline.
-# ===================================================
-
+"""
+COMPARISON LEMMATIZATION VS STEMMING
+This script is used for methodological comparison.
+ The selected method will be integrated in the final pipeline.
+"""
 from Utils import *
 from parameters import *
 

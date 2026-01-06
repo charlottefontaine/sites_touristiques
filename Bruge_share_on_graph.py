@@ -1,13 +1,40 @@
+"""
+Annotates the global Jaccard co-occurrence graph with a Bruges-specific score.
+
+The script:
+- loads the term-frequency matrix with a 'city' column (df_freq_terms.csv),
+- computes, for each term, the share of its total frequency that comes from Bruges:
+    share(w) = freq_Bruges(w) / freq_total(w),
+- loads the Gephi nodes file for the Jaccard graph,
+- adds a 'bruges_share' column to each node,
+- saves an updated nodes file for use in Gephi.
+
+Inputs
+------
+- data/processed/df_freq_terms.csv
+    Document-term frequency matrix with a 'city' column.
+- data/link_analysis/coocurence_window_graph/nodes_jaccard.csv
+    Nodes file from the global Jaccard co-occurrence graph export.
+
+Outputs
+-------
+- data/link_analysis/coocurence_window_graph/nodes_jaccard_brugeShare.csv
+    Same nodes as input, with an extra 'bruges_share' column.
+"""
+
 import pandas as pd
 import numpy as np
+import os
 
+FREQ_PATH = "data/processed/df_freq_terms.csv"
 
-FREQ_PATH = "data/processed/df_freq_terms.csv"          
+NODES_JACCARD_PATH = (
+    "data/link_analysis/coocurence_window_graph/nodes_jaccard.csv"
+)
 
-NODES_JACCARD_PATH = "gephi_export/nodes_jaccard.csv"  
-
-OUTPUT_NODES_PATH = "gephi_export/nodes_jaccard_brugeShare.csv"
-
+OUTPUT_NODES_PATH = (
+    "data/link_analysis/coocurence_window_graph/nodes_jaccard_brugeShare.csv"
+)
 
 def compute_bruges_share_per_term(freq_path: str,
                                   city_name: str = "Bruges") -> pd.Series:
@@ -54,7 +81,7 @@ def add_bruges_share_to_nodes(nodes_path: str,
 
     # map term -> share of Bruges
     df_nodes["bruges_share"] = df_nodes[id_col].map(share).fillna(0.0)
-
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df_nodes.to_csv(output_path, index=False)
     print(f"Updated nodes file with 'bruges_share' saved to {output_path}")
 

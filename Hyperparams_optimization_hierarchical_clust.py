@@ -1,4 +1,19 @@
-# use to determine which parameters are efficient for the hierarchical clustering
+"""
+hyperparams_optimization_hierarchical_clust.py
+
+Test different combinations of distance metrics and methods
+link for hierarchical clustering of cities.
+
+Input
+-----
+data/processed/tfidf_by_city_norm.csv
+    Cities x terms matrix (rows normalized to 1).
+
+Outputs
+-------
+data/text_analysis/city_similarity/city_dendrogram_{metric}_{method}.png
+    A dendrogram by combination of (metric, method).
+"""
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist
 import os
@@ -7,11 +22,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics.pairwise import cosine_similarity
 
-BASE_PATH = "data/processed"
-TFIDF_CITY_PATH = os.path.join(BASE_PATH, "tfidf_by_city_norm.csv")
-OUTPUT_DIR = "data/city_similarity"
+BASE_DIR = "data"
+PROCESSED_DIR = os.path.join(BASE_DIR, "processed")
+TFIDF_CITY_PATH = os.path.join(PROCESSED_DIR, "tfidf_by_city_norm.csv")
 
+OUTPUT_DIR = os.path.join(BASE_DIR, "text_analysis", "city_similarity")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 
 
 def plot_city_dendrogram(df_tfidf_city: pd.DataFrame,
