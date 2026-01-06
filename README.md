@@ -128,7 +128,23 @@ Beyond global trends, we analyzed how specific keywords are used in different co
 ### 5. Structural Network (Gephi)
 Mapping the connectivity and content hubs of the analyzed tourist sites.
 ***
-#### 5.1 Bruges in the Shared Lexical Graph
+
+#### 5.1 Global Lexical Networks (Cosine & Jaccard)
+To capture both shared structures and destination‑specific signatures, two complementary graphs were built from the same co‑occurrence data:
+
+- **Cosine similarity graph** – reveals the common thematic backbone of European tourist communication (heritage, accessibility, urban atmosphere) and how cities cluster together in a shared semantic space.  
+- **Jaccard similarity graph** – highlights each city’s distinctive lexical fingerprint by focusing on the presence/absence of terms, making local vocabularies and niche positioning (e.g. Bruges’ strongly place‑anchored lexicon) more visible.
+
+**Global cosine similarity graph**
+<br>
+<img width="500" height="935" alt="image" src="https://github.com/user-attachments/assets/d579ce6c-27eb-4a38-9afa-ceba549b8711" />
+
+**Global Jaccard similarity graph**
+<br>
+<img width="500" height="985" alt="image" src="https://github.com/user-attachments/assets/f08cac32-ba9f-49ec-a0ff-f0fcf9818aa7" />
+
+
+#### 5.2 Bruges in the Shared Lexical Graph
 This projection shows how **Bruges**’ key terms are embedded in the global co‑occurrence network built from all cities’ content. Nodes represent words, edges represent co‑occurrences within a sliding window, and colors indicate communities detected by modularity clustering.
 
 <img width="520" height="280" alt="Bruges shared lexical graph" src="<img width="759" height="715" alt="image" src="https://github.com/user-attachments/assets/ccabd45f-7af6-4c3b-ae6e-21eff6b03a83" />
