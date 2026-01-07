@@ -43,7 +43,10 @@ This quick start reproduces the full analytical pipeline, from web scraping to s
 Python 3.9+
 
 ## Install dependencies
-pip install -r requirements.txt
+
+```bash
+pip install pandas numpy matplotlib seaborn networkx scipy scikit-learn nltk requests beautifulsoup4 openpyxl wordcloud
+```
 
 ## Configure cities, websites and categories
 parameters.py
